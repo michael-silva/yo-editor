@@ -1,4 +1,8 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
+<link rel="import" href="../yo-image/yo-image.html">
+<link rel="import" href="../yo-link/yo-link.html">
+<link rel="import" href="../paper-input/paper-input.html">
 
 <dom-module id="yo-editor-item">
     <template>
@@ -6,8 +10,21 @@
             :host {
                 display: block;
             }
+
+            #image {
+                max-width: 100%;
+            }
         </style>
-        <h2>Hello [[prop1]]!</h2>
+        <template is="dom-if" if="{{_showText}}">
+            <paper-input value="[[text]]" label="Text"></paper-input>
+        </template>
+        <template is="dom-if" if="{{_showLink}}">
+            <yo-link url-value="[[url]]" text-value="[[text]]"></yo-link>
+        </template>
+        <template is="dom-if" if="{{_showImage}}">
+            <img id="image" src$="[[src]]" on-load="_setTarget">
+            <yo-image id="yo-image"></yo-image>        
+        </template>
     </template>
 
     <script>
@@ -23,11 +40,43 @@
             static get is() { return 'yo-editor-item'; }
             static get properties() {
                 return {
-                    prop1: {
-                        type: String,
-                        value: 'yo-editor-item'
+                    text: {
+                        type: String
+                    },
+                    url: {
+                        type: String
+                    },
+                    src: {
+                        type: String
                     }
                 };
+            }
+
+            _setTarget(e) {
+                const yoImage = this.root.querySelector('yo-image');
+                yoImage.target = e.target;
+            }
+
+            _defineShowVars() {
+                this._showLink = this.text && !this.url;
+                this._showImage = !!this.src;
+                this._showText = !!this.url;
+            }
+
+            constructor() {
+                super();
+                console.log('constructor', this.src, this.url, this.text);
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+                console.log('connectedCallback', this.root.querySelector('#image'));
+            }
+
+            ready() {
+                super.ready();
+                console.log('ready')
+                this._defineShowVars()
             }
         }
 

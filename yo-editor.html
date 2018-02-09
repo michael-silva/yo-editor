@@ -1,4 +1,8 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../sortable-list/sortable-list.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="./yo-editor-item.html">
 
 <dom-module id="yo-editor">
     <template>
@@ -6,8 +10,25 @@
             :host {
                 display: block;
             }
+            .tab {
+                padding: 10px;
+                display: inline-block;
+            }
+
+            .tab:hover {
+                background-color: #efefef;
+            }
         </style>
-        <h2>Hello [[prop1]]!</h2>
+        <template is="dom-repeat" items="{{items}}">
+            <a class="tab" href="#" on-click="_changePage">{{_getItemTitle(item)}}</a>
+        </template>
+        <iron-pages selected="{{_current}}">
+            <template is="dom-repeat" items="{{items}}">
+                <div class="page">
+                    <yo-editor-item src="{{item.src}}" url="{{item.url}}" text="{{item.text}}"></yo-editor-item>
+                </div>
+            </template>
+        </iron-pages>
     </template>
 
     <script>
@@ -23,11 +44,41 @@
             static get is() { return 'yo-editor'; }
             static get properties() {
                 return {
-                    prop1: {
-                        type: String,
-                        value: 'yo-editor'
+                    items: {
+                        type: Object,
+                        value: [{
+                            text: 'This is a simple text'
+                        }, 
+                        {
+                            url: 'http://uol.com.br'
+                        }, 
+                        {
+                            src: 'https://placeimg.com/640/480/any'
+                        },
+                        {
+                            url: 'http://uol.com.br',
+                            src: 'https://placeimg.com/640/480/any'
+                        }]
                     }
                 };
+            }
+
+            _changePage(e) {
+                this._current = e.model.index;
+            }
+
+            _getItemTitle(item) {
+                const title = item.text || item.url || item.src;
+                return title.substring(0, 17) + '...';
+            }
+
+            constructor() {
+                super();
+                this._current = 0;
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
             }
         }
 

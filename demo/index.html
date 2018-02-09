@@ -12,6 +12,7 @@
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../yo-editor-item.html">
+    <link rel="import" href="../yo-editor.html">
 
     <custom-style>
         <style is="custom-style" include="demo-pages-shared-styles">
@@ -24,7 +25,39 @@
         <h3>Basic yo-editor demo</h3>
         <demo-snippet>
             <template>
-                <yo-editor-item></yo-editor-item>
+                <yo-editor></yo-editor>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor-item text="This is a simple text"></yo-editor-item>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 2 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor-item url="http://uol.com.br"></yo-editor-item>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 3 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor-item src="https://placeimg.com/640/480/any"></yo-editor-item>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 4 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor-item url="http://uol.com.br" src="https://placeimg.com/640/480/any"></yo-editor-item>
             </template>
         </demo-snippet>
     </div>
