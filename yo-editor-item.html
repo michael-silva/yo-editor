@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="yo-editor-item">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h2>Hello [[prop1]]!</h2>
+    </template>
+
+    <script>
+        /**
+         * `yo-editor-item`
+         * An generic html elements editor
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        class YoEditorItem extends Polymer.Element {
+            static get is() { return 'yo-editor-item'; }
+            static get properties() {
+                return {
+                    prop1: {
+                        type: String,
+                        value: 'yo-editor-item'
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(YoEditorItem.is, YoEditorItem);
+    </script>
+</dom-module>
