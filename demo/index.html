@@ -25,39 +25,84 @@
         <h3>Basic yo-editor demo</h3>
         <demo-snippet>
             <template>
-                <yo-editor></yo-editor>
-            </template>
-        </demo-snippet>
-    </div>
-    <div class="vertical-section-container centered">
-        <h3>Basic yo-editor demo</h3>
-        <demo-snippet>
-            <template>
-                <yo-editor-item text="This is a simple text"></yo-editor-item>
-            </template>
-        </demo-snippet>
-    </div>
-    <div class="vertical-section-container centered">
-        <h3>Basic 2 yo-editor demo</h3>
-        <demo-snippet>
-            <template>
-                <yo-editor-item url="http://uol.com.br"></yo-editor-item>
-            </template>
-        </demo-snippet>
-    </div>
-    <div class="vertical-section-container centered">
-        <h3>Basic 3 yo-editor demo</h3>
-        <demo-snippet>
-            <template>
-                <yo-editor-item src="https://placeimg.com/640/480/any"></yo-editor-item>
-            </template>
-        </demo-snippet>
-    </div>
-    <div class="vertical-section-container centered">
-        <h3>Basic 4 yo-editor demo</h3>
-        <demo-snippet>
-            <template>
-                <yo-editor-item url="http://uol.com.br" src="https://placeimg.com/640/480/any"></yo-editor-item>
+                <yo-editor id="editor1"></yo-editor>
+                <button id="btn1">View Result</button>
+                <script>
+                    document.querySelector('#btn1').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor1').getItems());
+                    });
+                    document.querySelector('#editor1').items = [{
+                        texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        }]
+                    },
+                    {
+                        links: [{
+                            text: "Uol link with a large text asas sasas sasa",
+                            href: "http://uol.com.br"
+                        }]
+                    },
+                    {
+                        images: [{
+                            src: "https://placeimg.com/640/480/any"
+                        }],
+                        items: [{
+                            texts: [{
+                                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                            }]
+                        }, {
+                            images: [{
+                                src: "https://placeimg.com/640/480/any"
+                            }]
+                        },
+                        {
+                            texts: [{
+                                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                            }],
+                            images: [{
+                                src: "https://placeimg.com/640/480/any"
+                            }],
+                            links: [{
+                                text: "Uol link with a large text asas sasas sasa",
+                                href: "http://uol.com.br"
+                            }]
+                        }]
+                    },
+                    {
+                        texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        }],
+                        images: [{
+                            src: "https://placeimg.com/640/480/any"
+                        }],
+                        links: [{
+                            text: "Uol link with a large text asas sasas sasa",
+                            href: "http://uol.com.br"
+                        }]
+                    },
+                    {
+                        texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        }],
+                        images: [{
+                            src: "https://placeimg.com/640/480/any"
+                        }, {
+                            src: "https://placeimg.com/320/240/any"
+                        }, {
+                            src: "https://placeimg.com/320/240/any"
+                        }],
+                        links: [{
+                            text: "Uol link",
+                            href: "http://uol.com.br"
+                        }, {
+                            text: "Google link",
+                            href: "http://google.com"
+                        }, {
+                            text: "Apple link",
+                            href: "http://apple.com"
+                        }]
+                    }];
+                </script>
             </template>
         </demo-snippet>
     </div>

@@ -1,8 +1,10 @@
 <link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../polymer/lib/elements/dom-if.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../yo-image/yo-image.html">
 <link rel="import" href="../yo-link/yo-link.html">
-<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../yo-text/yo-text.html">
+<link rel="import" href="./yo-editor.html">
 
 <dom-module id="yo-editor-item">
     <template>
@@ -11,20 +13,104 @@
                 display: block;
             }
 
-            #image {
+            .image {
+                display: block;
                 max-width: 100%;
+                margin: auto;
+                cursor: pointer;
+                box-shadow: 0px 0px 1px rgba(0, 0, 0, .4);
+                transform: none;
+                transition: transform .3s ease-out, box-shadow .3s ease-out;
+            }
+
+            .image:hover {
+                z-index: 1;
+                box-shadow: 5px 5px 20px rgba(0, 0, 0, .4);
+                transform: scale(1.05);
+                transition: transform .3s ease-in, box-shadow .3s ease-in;
+            }
+
+            .hidden {
+                display: none;
+                pointer-events: none;
+            }
+
+            .hidden+paper-button {
+                display: none;
+                pointer-events: none;
+            }
+
+            .container {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .container>.block {
+                flex: 0 50%;
+            }
+
+            .link {
+                display: block;
+                text-decoration: none;
+                padding: 10px 15px;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+
+            .link.active {
+                text-decoration: underline;
+                background-color: var(--yo-editor-link-active-color, var(--paper-grey-300))
+            }
+
+            .link:hover {
+                text-decoration: underline;
+            }
+
+            .text {
+                font-size: 1rem;
+                line-height: 1.2rem;
+                max-height: 2.4rem;
+                overflow: hidden;
+            }
+
+            .text.active {
+                max-height: 7.2rem;
+                overflow-y: auto;
             }
         </style>
-        <template is="dom-if" if="{{_showText}}">
-            <paper-input value="[[text]]" label="Text"></paper-input>
-        </template>
-        <template is="dom-if" if="{{_showLink}}">
-            <yo-link url-value="[[url]]" text-value="[[text]]"></yo-link>
-        </template>
-        <template is="dom-if" if="{{_showImage}}">
-            <img id="image" src$="[[src]]" on-load="_setTarget">
-            <yo-image id="yo-image"></yo-image>        
-        </template>
+        <div class="texts">
+            <template is="dom-repeat" items="{{texts}}">
+                <p class="text" contenteditable on-focus="_textTarget" on-blur="_saveText">{{item.text}}</p>
+            </template>
+            <yo-text id="text" class="hidden" disable-autotarget></yo-text>
+        </div>
+        <div class="links">
+            <div class="container">
+                <template is="dom-repeat" items="{{links}}">
+                    <div class="block">
+                        <a class="link" href="javascript:;" on-click="_linkTarget">[[item.text]]</a>
+                    </div>
+                </template>
+            </div>
+            <yo-link id="link" class="hidden"></yo-link>
+            <paper-button raised on-click="_saveLink">Save link</paper-button>
+        </div>
+        <div class="images">
+            <div class="container">
+                <template is="dom-repeat" items="{{images}}">
+                    <div class="block">
+                        <img class="image" src="[[item.src]]" on-click="_imgTarget">
+                    </div>
+                </template>
+            </div>
+            <yo-image id="image" class="hidden">
+                <paper-button raised confirm-crop on-click="_saveImage">Confirm crop</paper-button>
+                <paper-button raised cancel-crop>Cancel</paper-button>
+            </yo-image>
+        </div>
+        <div class="subs">
+            <yo-editor items="{{items}}"></yo-editor>
+        </div>
     </template>
 
     <script>
@@ -40,43 +126,102 @@
             static get is() { return 'yo-editor-item'; }
             static get properties() {
                 return {
-                    text: {
-                        type: String
+                    texts: {
+                        type: Array,
+                        value: []
                     },
-                    url: {
-                        type: String
+                    links: {
+                        type: Array,
+                        value: []
                     },
-                    src: {
-                        type: String
+                    images: {
+                        type: Array,
+                        value: []
+                    },
+                    items: {
+                        type: Array,
+                        value: []
                     }
                 };
             }
 
-            _setTarget(e) {
-                const yoImage = this.root.querySelector('yo-image');
-                yoImage.target = e.target;
+            _toggleCurrent(newCurrent, newTarget) {
+                if (this._current) {
+                    this._current.classList.add('hidden');
+                }
+
+                if (this._target) {
+                    this._target.classList.remove('active');
+                }
+
+                this._target = (this._target === newTarget) ? undefined : newTarget;
+                this._current = (!this._target) ? undefined : newCurrent;
+
+                if (this._target) {
+                    this._current.classList.remove('hidden');
+                    this._target.classList.add('active');
+                }
             }
 
-            _defineShowVars() {
-                this._showLink = this.text && !this.url;
-                this._showImage = !!this.src;
-                this._showText = !!this.url;
+            _imgTarget(e) {
+                this._toggleCurrent(this.$.image, e.target);
+                if (!this._current) return;
+
+                this._index = e.model.index;
+                this._current.target = e.target;
+            }
+
+            _linkTarget(e) {
+                this._toggleCurrent(this.$.link, e.target);
+                if (!this._current) return;
+
+                this._index = e.model.index;
+                this._current.urlValue = e.model.item.href;
+                this._current.textValue = e.model.item.text;
+            }
+
+            _textTarget(e) {
+                this._toggleCurrent(this.$.text, e.target);
+                if (!this._current) return;
+
+                this._index = e.model.index;
+                this._current.targetElement = e.target;
+            }
+
+            _saveImage() {
+                this.images[this._index].src = this._current.getCroppedData();
+            }
+
+            _saveText() {
+                this.texts[this._index].text = this._target.innerHTML;
+            }
+
+            _saveLink() {
+                this.links[this._index].href = this._current.urlValue;
+                this.links[this._index].text = this._current.textValue;
+                this._toggleCurrent(this.$.link, this._target);
             }
 
             constructor() {
                 super();
-                console.log('constructor', this.src, this.url, this.text);
-            }
-
-            connectedCallback() {
-                super.connectedCallback();
-                console.log('connectedCallback', this.root.querySelector('#image'));
+                this._MAXELEM = 3;
+                this.LARGE_TEXT_LENGTH = 150;
             }
 
             ready() {
                 super.ready();
-                console.log('ready')
-                this._defineShowVars()
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+            }
+
+            getItem() {
+                return {
+                    texts: this.texts,
+                    images: this.images,
+                    links: this.links
+                }
             }
         }
 

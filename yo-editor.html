@@ -2,6 +2,7 @@
 <link rel="import" href="../polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../sortable-list/sortable-list.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="./yo-editor-item.html">
 
 <dom-module id="yo-editor">
@@ -10,22 +11,26 @@
             :host {
                 display: block;
             }
+
             .tab {
                 padding: 10px;
                 display: inline-block;
             }
 
-            .tab:hover {
-                background-color: #efefef;
+            .tab:hover,
+            .tab.active {
+                background-color: var(--yo-editor-tab-active,  var(--paper-grey-300));
             }
         </style>
-        <template is="dom-repeat" items="{{items}}">
-            <a class="tab" href="#" on-click="_changePage">{{_getItemTitle(item)}}</a>
-        </template>
+        <sortable-list>
+            <template is="dom-repeat" items="{{items}}">
+                <a class="tab" href="#" on-click="_changePage">{{_getItemTitle(item)}}</a>
+            </template>
+        </sortable-list>
         <iron-pages selected="{{_current}}">
             <template is="dom-repeat" items="{{items}}">
                 <div class="page">
-                    <yo-editor-item src="{{item.src}}" url="{{item.url}}" text="{{item.text}}"></yo-editor-item>
+                    <yo-editor-item images="{{item.images}}" links="{{item.links}}" texts="{{item.texts}}" items="{{item.items}}"></yo-editor-item>
                 </div>
             </template>
         </iron-pages>
@@ -45,30 +50,28 @@
             static get properties() {
                 return {
                     items: {
-                        type: Object,
-                        value: [{
-                            text: 'This is a simple text'
-                        }, 
-                        {
-                            url: 'http://uol.com.br'
-                        }, 
-                        {
-                            src: 'https://placeimg.com/640/480/any'
-                        },
-                        {
-                            url: 'http://uol.com.br',
-                            src: 'https://placeimg.com/640/480/any'
-                        }]
+                        type: Array,
+                        value: []
                     }
                 };
             }
 
             _changePage(e) {
+                if (this._target) 
+                    this._target.classList.remove('active');
+
+                this._target = e.target;
                 this._current = e.model.index;
+
+                this._target.classList.add('active');
             }
 
             _getItemTitle(item) {
-                const title = item.text || item.url || item.src;
+                let title = item.texts || item.links;
+                
+                if (!title) title = item.images[0].src;
+                else title = title[0].text;
+
                 return title.substring(0, 17) + '...';
             }
 
@@ -79,6 +82,10 @@
 
             connectedCallback() {
                 super.connectedCallback();
+            }
+
+            getItems() {
+                this.root.querySelectorAll('yo-editor-item').map(item => item.getItem());
             }
         }
 
