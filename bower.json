@@ -1,24 +1,25 @@
 {
-  "name": "yo-editor",
-  "description": "An generic html elements editor",
-  "main": "yo-editor.html",
-  "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0",
-    "yo-image": "michael-silva/yo-image#^0.0.3",
-    "yo-link": "michael-silva/yo-link#^1.0.0",
-    "sortable-list": "sharedlabs/sortable-list#^1.0.2",
-    "paper-input": "^2.1.1",
-    "iron-pages": "^2.0.1",
-    "yo-text": "michael-silva/yo-text#^0.1.6",
-    "paper-styles": "^2.0.0",
-    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
-  },
-  "devDependencies": {
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
-    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
-  },
-  "resolutions": {
-    "polymer": "^2.0.0"
-  }
+    "name": "yo-editor",
+    "description": "An generic html elements editor",
+    "main": "yo-editor.html",
+    "version": "0.0.1",
+    "dependencies": {
+        "polymer": "Polymer/polymer#^2.0.0",
+        "yo-image": "michael-silva/yo-image#^0.0.4",
+        "yo-link": "michael-silva/yo-link#^1.0.1",
+        "sortable-list": "sharedlabs/sortable-list#^1.0.2",
+        "paper-input": "^2.1.1",
+        "iron-pages": "^2.0.1",
+        "yo-text": "michael-silva/yo-text#^0.1.6",
+        "paper-styles": "^2.0.0",
+        "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
+    },
+    "devDependencies": {
+        "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+        "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+        "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
+    },
+    "resolutions": {
+        "polymer": "^2.0.0"
+    }
 }

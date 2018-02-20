@@ -25,7 +25,7 @@
         <h3>Basic yo-editor demo</h3>
         <demo-snippet>
             <template>
-                <yo-editor id="editor1"></yo-editor>
+                <yo-editor vertical id="editor1"></yo-editor>
                 <button id="btn1">View Result</button>
                 <script>
                     document.querySelector('#btn1').addEventListener('click', () => {
@@ -33,6 +33,152 @@
                     });
                     document.querySelector('#editor1').items = [{
                         texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        }]
+                    }];
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 2 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor vertical id="editor2"></yo-editor>
+                <button id="btn2">View Result</button>
+                <script>
+                    document.querySelector('#btn2').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor2').getItems());
+                    });
+                    document.querySelector('#editor2').items = [{
+                        links: [{
+                            href: "http://uol.com.br"
+                        }, {
+                            href: "http://tecmundo.com.br"
+                        }, {
+                            href: "http://google.com"
+                        }, {
+                            href: "http://facebook.com"
+                        }, {
+                            href: "http://imasters.com.br"
+                        }]
+                    }, {
+                        links: [{
+                            href: "http://uol.com.br"
+                        }, {
+                            href: "http://tecmundo.com.br"
+                        }, {
+                            href: "http://google.com"
+                        }, {
+                            href: "http://facebook.com"
+                        }, {
+                            href: "http://imasters.com.br"
+                        }]
+                    }];
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 3 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor vertical id="editor3"></yo-editor>
+                <button id="btn3">View Result</button>
+                <script>
+                    document.querySelector('#btn3').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor3').getItems());
+                    });
+                    document.querySelector('#editor3').items = [{
+                        images: [{
+                            src: "https://placeimg.com/320/480/any"
+                        }, {
+                            src: "https://placeimg.com/340/480/any"
+                        }, {
+                            src: "https://placeimg.com/340/480/any"
+                        }, {
+                            src: "https://placeimg.com/340/480/any"
+                        }, {
+                            src: "https://placeimg.com/440/300/any"
+                        }, {
+                            src: "https://placeimg.com/320/220/any"
+                        }, {
+                            src: "https://placeimg.com/240/240/any"
+                        }, {
+                            src: "https://placeimg.com/340/380/any"
+                        }]
+                    }];
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 4 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor vertical id="editor4"></yo-editor>
+                <button id="btn4">View Result</button>
+                <script>
+                    document.querySelector('#btn4').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor4').getItems());
+                    });
+                    document.querySelector('#editor4').items = [{
+                        links: [{
+                            text: "Uol image link",
+                            href: "http://uol.com.br"
+                        }],
+                        images: [{
+                            src: "https://placeimg.com/320/240/any"
+                        }]
+                    }];
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Basic 5 yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor vertical id="editor5"></yo-editor>
+                <button id="btn5">View Result</button>
+                <script>
+                    document.querySelector('#btn5').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor5').getItems());
+                    });
+                    document.querySelector('#editor5').items = [{
+                        texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        }, {
+                            text: "Lorem ipsum dolor sit amet"
+                        }, {
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                        }],
+                        images: [{
+                            src: "https://placeimg.com/320/480/any"
+                        }]
+                    }];
+                </script>
+            </template>
+        </demo-snippet>
+    </div>
+    <div class="vertical-section-container centered">
+        <h3>Advanced usage yo-editor demo</h3>
+        <demo-snippet>
+            <template>
+                <yo-editor vertical id="editor"></yo-editor>
+                <button id="btn">View Result</button>
+                <script>
+                    document.querySelector('#btn').addEventListener('click', () => {
+                        console.log(document.querySelector('#editor').getItems());
+                    });
+                    document.querySelector('#editor').items = [{
+                        texts: [{
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        },
+                        {
+                            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
+                        },
+                        {
                             text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "
                         }]
                     },
@@ -105,7 +251,7 @@
                 </script>
             </template>
         </demo-snippet>
-    </div>
+    </div>-->
 </body>
 
 </html>

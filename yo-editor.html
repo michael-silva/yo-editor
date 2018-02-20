@@ -9,24 +9,91 @@
     <template>
         <style>
             :host {
-                display: block;
+                box-sizing: content-box;
+                position: relative;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            :host([vertical]) {
+                flex-direction: row;
             }
 
             .tab {
+                color: var(--yo-editor-tab-color, var(--paper-black));
                 padding: 10px;
+                text-decoration: none;
+                text-transform: uppercase;
                 display: inline-block;
+                background-color: #fff;
+                border-width: 0;
+                border-style: solid;
+                border-color: var(--yo-editor-tab-active-color, var(--paper-indigo-600));
+                min-width: 40px;
             }
 
             .tab:hover,
             .tab.active {
-                background-color: var(--yo-editor-tab-active,  var(--paper-grey-300));
+                font-weight: bold;
+            }
+
+            .tab.active {
+                color: var(--yo-editor-tab-active-color, var(--paper-indigo-600));
+                border-bottom-width: 3px;
+                transition: all .3s ease;
+            }
+
+            .tabs {
+                height: auto;
+                width: 100%;
+                margin-bottom: 15px;
+                border-bottom: 1px solid var(--yo-editor-tabs-line-bgcolor, var(--paper-grey-300));
+            }
+
+            .tabs.vertical {
+                display: flex;
+                flex-flow: column;
+                width: auto;
+                height: 100%;
+                margin-right: 15px;
+                border-bottom: none;
+                border-right: 1px solid var(--yo-editor-tabs-line-bgcolor, var(--paper-grey-300));
+            }
+
+            .tabs.vertical .tab {
+                display: block;
+                width: auto;
+            }
+
+            .tabs.vertical .tab.active {
+                border-bottom-width: 0;
+                border-right-width: 3px;
+                transition: all .3s ease;
+            }
+
+            .tabs.hidden {
+                display: none;
+                pointer-events: none;
+            }
+
+            .tabs.hidden + iron-pages {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            iron-pages {
+                min-width: 70%;
+                max-width: 90%;
             }
         </style>
-        <sortable-list>
-            <template is="dom-repeat" items="{{items}}">
-                <a class="tab" href="#" on-click="_changePage">{{_getItemTitle(item)}}</a>
-            </template>
-        </sortable-list>
+        <div class="tabs">
+            <sortable-list sortable=".tab">
+                <template is="dom-repeat" items="{{items}}">
+                    <a class="tab" href="#" data-index$="[[index]]" on-click="_changePage">{{_getItemTitle(item, index)}}</a>
+                </template>
+            </sortable-list>
+        </div>
         <iron-pages selected="{{_current}}">
             <template is="dom-repeat" items="{{items}}">
                 <div class="page">
@@ -51,41 +118,80 @@
                 return {
                     items: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '_itemsChanged'
+                    },
+                    vertical: {
+                        type: Boolean,
+                        reflectToAttribute: true,
+                        observer: '_verticalChanged'
                     }
                 };
             }
 
-            _changePage(e) {
-                if (this._target) 
+            _itemsChanged(newItems) {
+                if (!newItems || newItems.length <= 1) {
+                    this.root.querySelector('.tabs').classList.add('hidden');
+                }
+                else {
+                    this.root.querySelector('.tabs').classList.remove('hidden');
+                }
+            }
+
+            _verticalChanged(newVertical) {
+                if (newVertical) {
+                    this.root.querySelector('.tabs').classList.add('vertical');
+                }
+                else {
+                    this.root.querySelector('.tabs').classList.remove('vertical');
+                }
+            }
+
+            _setCurrentPage(elem, index) {
+                if (this._target)
                     this._target.classList.remove('active');
 
-                this._target = e.target;
-                this._current = e.model.index;
+                this._target = elem;
+                this._current = index;
 
                 this._target.classList.add('active');
             }
 
-            _getItemTitle(item) {
-                let title = item.texts || item.links;
-                
-                if (!title) title = item.images[0].src;
-                else title = title[0].text;
+            _changePage(e) {
+                e.preventDefault();
+                this._setCurrentPage(e.target, e.model.index);
+            }
 
-                return title.substring(0, 17) + '...';
+            _getItemTitle(item, index) {
+                const maxlength = 17;
+                let title = item.texts || item.links;
+
+                if (!title) title = item.images[0].src;
+                else if (title.length == 1 && title[0].text) title = title[0].text;
+                else title = '# ' + index;
+
+                return title.substring(0, maxlength) + (title.length > maxlength ? '...' : '');
             }
 
             constructor() {
                 super();
-                this._current = 0;
             }
 
             connectedCallback() {
                 super.connectedCallback();
+                if (this.items && this.items.length > 0) {
+                    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
+                }
             }
 
             getItems() {
-                this.root.querySelectorAll('yo-editor-item').map(item => item.getItem());
+                const items = [];
+                const editors = this.root.querySelectorAll('yo-editor-item');
+                this.root.querySelectorAll('.tab').forEach(tab => {
+                    const i = +tab.getAttribute('data-index');
+                    items.push(editors[i].getItem());
+                });
+                return items;
             }
         }
 

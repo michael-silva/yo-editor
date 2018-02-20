@@ -14,6 +14,7 @@
             }
 
             .image {
+                pointer-events: none;
                 display: block;
                 max-width: 100%;
                 margin: auto;
@@ -23,19 +24,19 @@
                 transition: transform .3s ease-out, box-shadow .3s ease-out;
             }
 
-            .image:hover {
-                z-index: 1;
+            .block:hover > .image,
+            .image.active {
                 box-shadow: 5px 5px 20px rgba(0, 0, 0, .4);
-                transform: scale(1.05);
+                transform: scale(1.3);
                 transition: transform .3s ease-in, box-shadow .3s ease-in;
             }
 
-            .hidden {
-                display: none;
-                pointer-events: none;
+            .image.active {
+                filter: grayscale(100%);
+                transition: all .3s ease-out;
             }
 
-            .hidden+paper-button {
+            .hidden {
                 display: none;
                 pointer-events: none;
             }
@@ -45,21 +46,34 @@
                 flex-wrap: wrap;
             }
 
-            .container>.block {
-                flex: 0 50%;
+            .image-container {
+                column-width: 150px;
+                column-gap: 5px;
+            }
+
+            .image-container > .block {
+                cursor: pointer;
+                overflow: hidden;
+                position: relative;
+                display: inline-block;
+                margin-bottom: 2px;
+                width:  100%; 
             }
 
             .link {
+                text-transform: lowercase;
                 display: block;
                 text-decoration: none;
                 padding: 10px 15px;
                 overflow: hidden;
                 white-space: nowrap;
+                color: var(--yo-editor-link-color, var(--paper-indigo-600));
             }
 
             .link.active {
                 text-decoration: underline;
-                background-color: var(--yo-editor-link-active-color, var(--paper-grey-300))
+                background-color: var(--yo-editor-link-active-bgcolor, var(--paper-grey-300));
+                color: var(--yo-editor-link-active-color, var(--paper-indigo-600));
             }
 
             .link:hover {
@@ -67,49 +81,67 @@
             }
 
             .text {
-                font-size: 1rem;
-                line-height: 1.2rem;
-                max-height: 2.4rem;
+                text-transform: none;
+                color: var(--yo-editor-tab-color, #000);
+                font-size: var(--yo-editor-text-size, 16px);
+                line-height: 1.4em;
+                max-height: 2.8em;
                 overflow: hidden;
             }
 
             .text.active {
-                max-height: 7.2rem;
+                max-height: 7.2em;
                 overflow-y: auto;
+            }
+
+            .subs {
+                margin-top: 15px;
+            }
+
+            paper-button {
+                background-color: var(--yo-editor-button-bgcolor, #fff);
+                color: var(--yo-editor-button-color, var(--paper-indigo-600));
+                margin-top: 1em;
+                margin-bottom: 1em;
+            }
+
+            paper-button[raised] {
+                color: var(--yo-editor-button-bgcolor, #fff);
+                background-color: var(--yo-editor-button-color, var(--paper-indigo-600));
             }
         </style>
         <div class="texts">
             <template is="dom-repeat" items="{{texts}}">
                 <p class="text" contenteditable on-focus="_textTarget" on-blur="_saveText">{{item.text}}</p>
             </template>
-            <yo-text id="text" class="hidden" disable-autotarget></yo-text>
         </div>
         <div class="links">
             <div class="container">
                 <template is="dom-repeat" items="{{links}}">
-                    <div class="block">
-                        <a class="link" href="javascript:;" on-click="_linkTarget">[[item.text]]</a>
-                    </div>
+                     <a class="link" href="javascript:;" on-click="_linkTarget">{{_getLinkTitle(item, index)}}</a>
                 </template>
             </div>
-            <yo-link id="link" class="hidden"></yo-link>
-            <paper-button raised on-click="_saveLink">Save link</paper-button>
+            <yo-link id="link" preview-disabled class="hidden">
+                <div slot="footer">
+                    <paper-button raised on-click="_saveLink">Save link</paper-button>
+                </div>
+            </yo-link>
         </div>
         <div class="images">
-            <div class="container">
+            <div class="image-container">
                 <template is="dom-repeat" items="{{images}}">
-                    <div class="block">
-                        <img class="image" src="[[item.src]]" on-click="_imgTarget">
+                    <div class="block" on-click="_imgTarget">
+                        <img class="image" src="[[item.src]]" >
                     </div>
                 </template>
             </div>
             <yo-image id="image" class="hidden">
                 <paper-button raised confirm-crop on-click="_saveImage">Confirm crop</paper-button>
-                <paper-button raised cancel-crop>Cancel</paper-button>
+                <paper-button cancel-crop>Cancel</paper-button>
             </yo-image>
         </div>
         <div class="subs">
-            <yo-editor items="{{items}}"></yo-editor>
+            <yo-editor id="editor" items="{{items}}"></yo-editor>
         </div>
     </template>
 
@@ -128,25 +160,87 @@
                 return {
                     texts: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '_textsChanged'
                     },
                     links: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '_linksChanged'
                     },
                     images: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '_imagesChanged'
                     },
                     items: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '_itemsChanged'
                     }
                 };
             }
 
+            _getLinkTitle(link, index) {
+                const maxlength = 17;
+                let title = link.text || link.href;
+
+                return title.substring(0, maxlength) + (title.length > maxlength ? '...' : '');
+            }
+
+            _getTotalEditors() {
+                if (!this.texts || !this.links || !this.images) return 0;
+                return this.texts.length + this.links.length + this.images.length;
+            }
+
+            _setDefaultCurrent() {
+                this._textsChanged();
+                this._linksChanged();
+                this._imagesChanged();
+            }
+
+            _textsChanged() {
+                const target = this.root.querySelector('.text');
+                if (!target) return;
+                if (this._getTotalEditors() === 1 && this.texts.length === 1) {
+                    target.focus();
+                }
+            }
+
+            _linksChanged() {
+                const target = this.root.querySelector('.link');
+                if (!target) return;
+                if (this._getTotalEditors() === 1 && this.links.length === 1) {
+                    target.click();
+                }
+                else if(this.images.length === 0) {
+                    this.$.link.removeAttribute('preview-disabled');
+                }
+                else {
+                    this.$.link.setAttribute('preview-disabled', true);
+                }
+            }
+
+            _imagesChanged() {
+                const target = this.root.querySelector('.block');
+                if (!target) return;
+                if (this._getTotalEditors() === 1 && this.images.length === 1) {
+                    target.click();
+                }
+            }
+
+            _itemsChanged(newItems) {
+                if (!newItems || newItems.length === 0) {
+                    this.root.querySelector('.subs').classList.add('hidden');
+                }
+                else {
+                    this.root.querySelector('.subs').classList.remove('hidden');
+                }
+            }
+
             _toggleCurrent(newCurrent, newTarget) {
                 if (this._current) {
+                    if (this._getTotalEditors() === 1) return;
                     this._current.classList.add('hidden');
                 }
 
@@ -164,11 +258,12 @@
             }
 
             _imgTarget(e) {
-                this._toggleCurrent(this.$.image, e.target);
+                const target = e.target.children[0];
+                this._toggleCurrent(this.$.image, target);
                 if (!this._current) return;
 
                 this._index = e.model.index;
-                this._current.target = e.target;
+                this._current.target = target;
             }
 
             _linkTarget(e) {
@@ -181,6 +276,7 @@
             }
 
             _textTarget(e) {
+                if (this.$.text.mouseover) return;
                 this._toggleCurrent(this.$.text, e.target);
                 if (!this._current) return;
 
@@ -192,14 +288,27 @@
                 this.images[this._index].src = this._current.getCroppedData();
             }
 
-            _saveText() {
+            _saveText(e) {
+                if (this.$.text.mouseover) return;
                 this.texts[this._index].text = this._target.innerHTML;
+                this._toggleCurrent(this.$.text, e.target);
             }
 
             _saveLink() {
                 this.links[this._index].href = this._current.urlValue;
                 this.links[this._index].text = this._current.textValue;
                 this._toggleCurrent(this.$.link, this._target);
+            }
+
+            _createTextEditor() {
+                let yoText = document.querySelector('yo-text');
+                if (!yoText) {
+                    yoText = document.createElement('yo-text') 
+                    yoText.id = "yo-text"; 
+                    yoText.setAttribute('disable-autotarget', true);
+                    document.body.appendChild(yoText);
+                }
+                this.$.text = yoText;
             }
 
             constructor() {
@@ -210,6 +319,10 @@
 
             ready() {
                 super.ready();
+                this._createTextEditor();
+                setTimeout(() => {
+                    this._setDefaultCurrent();
+                }, 300);
             }
 
             connectedCallback() {
@@ -220,7 +333,8 @@
                 return {
                     texts: this.texts,
                     images: this.images,
-                    links: this.links
+                    links: this.links,
+                    items: this.$.editor.getItems()
                 }
             }
         }
