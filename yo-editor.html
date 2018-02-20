@@ -136,6 +136,10 @@
                 else {
                     this.root.querySelector('.tabs').classList.remove('hidden');
                 }
+
+                if (newItems && newItems.length > 0) {
+                    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
+                }
             }
 
             _verticalChanged(newVertical) {
@@ -179,9 +183,9 @@
 
             connectedCallback() {
                 super.connectedCallback();
-                if (this.items && this.items.length > 0) {
-                    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
-                }
+                //if (this.items && this.items.length > 0) {
+                //    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
+                //}
             }
 
             getItems() {
