@@ -97,7 +97,7 @@
         <iron-pages selected="{{_current}}">
             <template is="dom-repeat" items="{{items}}">
                 <div class="page">
-                    <yo-editor-item images="{{item.images}}" links="{{item.links}}" texts="{{item.texts}}" items="{{item.items}}"></yo-editor-item>
+                    <yo-editor-item on-ready="_itemReady" images="{{item.images}}" links="{{item.links}}" texts="{{item.texts}}" items="{{item.items}}"></yo-editor-item>
                 </div>
             </template>
         </iron-pages>
@@ -136,10 +136,6 @@
                 else {
                     this.root.querySelector('.tabs').classList.remove('hidden');
                 }
-
-                if (newItems && newItems.length > 0) {
-                    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
-                }
             }
 
             _verticalChanged(newVertical) {
@@ -177,15 +173,22 @@
                 return title.substring(0, maxlength) + (title.length > maxlength ? '...' : '');
             }
 
+            _itemReady(e) {
+                this._readyCount++;
+                if (this._readyCount === this.items.length) {
+                    this._setCurrentPage(this.root.querySelector('.tab'), 0);
+                    this.dispatchEvent(new CustomEvent('ready'));
+                    this._readyCount = 0;
+                }
+            }
+
             constructor() {
                 super();
+                this._readyCount = 0;
             }
 
             connectedCallback() {
                 super.connectedCallback();
-                //if (this.items && this.items.length > 0) {
-                //    setTimeout(() => this._setCurrentPage(this.root.querySelector('.tab'), 0), 300);
-                //}
             }
 
             getItems() {

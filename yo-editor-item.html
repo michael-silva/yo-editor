@@ -19,20 +19,23 @@
                 max-width: 100%;
                 margin: auto;
                 cursor: pointer;
-                box-shadow: 0px 0px 1px rgba(0, 0, 0, .4);
                 transform: none;
-                transition: transform .3s ease-out, box-shadow .3s ease-out;
+                transition: transform .3s ease-out;
             }
 
-            .block:hover > .image,
+            .block:hover>.image,
             .image.active {
-                box-shadow: 5px 5px 20px rgba(0, 0, 0, .4);
                 transform: scale(1.3);
-                transition: transform .3s ease-in, box-shadow .3s ease-in;
+                transition: all .3s ease-in;
             }
 
             .image.active {
                 filter: grayscale(100%);
+                transition: all .3s ease-out;
+            }
+
+            .block:hover>.image.active {
+                filter: grayscale(0);
                 transition: all .3s ease-out;
             }
 
@@ -51,13 +54,13 @@
                 column-gap: 5px;
             }
 
-            .image-container > .block {
+            .image-container>.block {
                 cursor: pointer;
                 overflow: hidden;
                 position: relative;
                 display: inline-block;
                 margin-bottom: 2px;
-                width:  100%; 
+                width: 100%;
             }
 
             .link {
@@ -111,37 +114,37 @@
             }
         </style>
         <div class="texts">
-            <template is="dom-repeat" items="{{texts}}">
+            <template is="dom-repeat" items="{{texts}}" on-dom-change="{{_onReady('texts')}}">
                 <p class="text" contenteditable on-focus="_textTarget" on-blur="_saveText">{{item.text}}</p>
             </template>
         </div>
         <div class="links">
             <div class="container">
-                <template is="dom-repeat" items="{{links}}">
-                     <a class="link" href="javascript:;" on-click="_linkTarget">{{_getLinkTitle(item, index)}}</a>
+                <template is="dom-repeat" items="{{links}}" on-dom-change="{{_onReady('links')}}">
+                    <a class="link" href="javascript:;" on-click="_linkTarget">{{_getLinkTitle(item, index)}}</a>
                 </template>
             </div>
-            <yo-link id="link" preview-disabled class="hidden">
-                <div slot="footer">
+            <yo-link id="link" preview-disabled class="hidden" on-change="_saveLink">
+                <!--<div slot="footer">
                     <paper-button raised on-click="_saveLink">Save link</paper-button>
-                </div>
+                </div>-->
             </yo-link>
         </div>
         <div class="images">
             <div class="image-container">
-                <template is="dom-repeat" items="{{images}}">
+                <template is="dom-repeat" items="{{images}}" on-dom-change="{{_onReady('images')}}">
                     <div class="block" on-click="_imgTarget">
-                        <img class="image" src="[[item.src]]" >
+                        <img class="image" src="[[item.src]]">
                     </div>
                 </template>
             </div>
-            <yo-image id="image" class="hidden">
-                <paper-button raised confirm-crop on-click="_saveImage">Confirm crop</paper-button>
+            <yo-image id="image" class="hidden" maxsize="1024">
+                <paper-button raised confirm-crop on-click="_saveImage">Ok</paper-button>
                 <paper-button cancel-crop>Cancel</paper-button>
             </yo-image>
         </div>
         <div class="subs">
-            <yo-editor id="editor" items="{{items}}"></yo-editor>
+            <yo-editor id="editor" items="{{items}}" on-ready="{{_onReady('items')}}"></yo-editor>
         </div>
     </template>
 
@@ -181,6 +184,21 @@
                 };
             }
 
+            _onReady(key) {
+                this._readyCount++;
+                let required = this.items && this.items.length > 0 ? 1 : 0;
+                if (this.texts && this.texts.length > 0) required++;
+                if (this.images && this.images.length > 0) required++;
+                if (this.links && this.links.length > 0) required++;
+                if (this._readyCount === required) {
+                    this._readyCount = 0;
+                    this.dispatchEvent(new CustomEvent('ready'));
+                    setTimeout(() => {
+                        this._setDefaultCurrent();
+                    }, 100);
+                }
+            }
+
             _getLinkTitle(link, index) {
                 const maxlength = 17;
                 let title = link.text || link.href;
@@ -213,7 +231,7 @@
                 if (this._getTotalEditors() === 1 && this.links.length === 1) {
                     target.click();
                 }
-                else if(this.images.length === 0) {
+                else if (this.images.length === 0) {
                     this.$.link.removeAttribute('preview-disabled');
                 }
                 else {
@@ -238,7 +256,11 @@
                 }
             }
 
-            _toggleCurrent(newCurrent, newTarget) {
+            _toggleCurrent(newCurrent, newTarget, onRemoveCallback) {
+                if (typeof (this._callback) === 'function') {
+                    this._callback();
+                }
+
                 if (this._current) {
                     if (this._getTotalEditors() === 1) return;
                     this._current.classList.add('hidden');
@@ -250,6 +272,7 @@
 
                 this._target = (this._target === newTarget) ? undefined : newTarget;
                 this._current = (!this._target) ? undefined : newCurrent;
+                this._callback = onRemoveCallback;
 
                 if (this._target) {
                     this._current.classList.remove('hidden');
@@ -259,7 +282,8 @@
 
             _imgTarget(e) {
                 const target = e.target.children[0];
-                this._toggleCurrent(this.$.image, target);
+                e.target.classList.add('active');
+                this._toggleCurrent(this.$.image, target, () => e.target.classList.remove('active'));
                 if (!this._current) return;
 
                 this._index = e.model.index;
@@ -295,16 +319,15 @@
             }
 
             _saveLink() {
-                this.links[this._index].href = this._current.urlValue;
-                this.links[this._index].text = this._current.textValue;
-                this._toggleCurrent(this.$.link, this._target);
+                this.set(`links.${this._index}`, { href: this._current.urlValue, text: this._current.textValue });
+                //this._toggleCurrent(this.$.link, this._target);
             }
 
             _createTextEditor() {
                 let yoText = document.querySelector('yo-text');
                 if (!yoText) {
-                    yoText = document.createElement('yo-text') 
-                    yoText.id = "yo-text"; 
+                    yoText = document.createElement('yo-text')
+                    yoText.id = "yo-text";
                     yoText.setAttribute('disable-autotarget', true);
                     document.body.appendChild(yoText);
                 }
@@ -315,14 +338,12 @@
                 super();
                 this._MAXELEM = 3;
                 this.LARGE_TEXT_LENGTH = 150;
+                this._readyCount = 0;
             }
 
             ready() {
                 super.ready();
                 this._createTextEditor();
-                setTimeout(() => {
-                    this._setDefaultCurrent();
-                }, 300);
             }
 
             connectedCallback() {

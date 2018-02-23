@@ -165,12 +165,30 @@
         <h3>Advanced usage yo-editor demo</h3>
         <demo-snippet>
             <template>
-                <yo-editor vertical id="editor"></yo-editor>
+                <style>
+                    .loading {
+                        position: relative;
+                    }
+                    .loading::before {
+                        content: 'loading...';
+                        display: block;
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        background-color: #d8f8f8;
+                    }
+                </style>
+                <yo-editor class="loading" vertical id="editor"></yo-editor>
                 <button id="btn">View Result</button>
                 <script>
                     document.querySelector('#btn').addEventListener('click', () => {
                         console.log(document.querySelector('#editor').getItems());
                     });
+                    document.querySelector('#editor').addEventListener('ready', e => {
+                        e.target.classList.remove('loading')
+                    })
                     document.querySelector('#editor').items = [{
                         texts: [{
                             text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam finibus lorem eu dui aliquam, non consequat nisl suscipit. Vivamus in dolor id diam iaculis posuere. Mauris velit lacus, convallis a augue vehicula, scelerisque efficitur est. "

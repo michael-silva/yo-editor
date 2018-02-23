@@ -5,7 +5,7 @@
     "version": "0.0.1",
     "dependencies": {
         "polymer": "Polymer/polymer#^2.0.0",
-        "yo-image": "michael-silva/yo-image#^0.0.4",
+        "yo-image": "michael-silva/yo-image#^0.0.5",
         "yo-link": "michael-silva/yo-link#^1.0.1",
         "sortable-list": "sharedlabs/sortable-list#^1.0.2",
         "paper-input": "^2.1.1",
